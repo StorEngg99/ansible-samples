@@ -1,0 +1,4 @@
+---
+# tasks file for mravindra.common
+   - name: check connectivity
+     ping:

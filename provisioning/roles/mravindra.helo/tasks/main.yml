@@ -1,0 +1,4 @@
+---
+# tasks file for mravindra.helo
+- name: Say Hello
+  debug: msg="Hello {{your_name}}"

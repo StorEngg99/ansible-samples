@@ -1,0 +1,17 @@
+---
+# tasks file for mravindra.php
+   - name: Add PPA repository
+     apt_repository: repo={{item}}
+     with_items:
+       - 'ppa:ondrej/php'
+   - name: Update the Apt Cache
+     apt: update_cache=yes cache_valid_time=3600
+   - name: Install PHP 7.2
+     apt: name={{item}} state=installed
+     with_items:
+       - php
+       - php-fpm
+       - php-mysql
+       - php-xml
+   - name: Remove apache2
+     apt: name=apache2 state=removed

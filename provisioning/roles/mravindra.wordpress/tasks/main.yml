@@ -1,0 +1,31 @@
+---
+# tasks file for mravindra.wordpress
+   - name: Copy Wordpress zip to temp
+     copy: src=wordpress.zip dest=/tmp/wordpress.zip
+   - name: Install Unzip Program
+     apt: name={{item}} state=installed
+     with_items:
+       - unzip
+   - name: Unzip Wordpress
+     unarchive: src=/tmp/wordpress.zip dest=/tmp copy=no creates=/tmp/wordpress/wp-settings.php
+   - name: Create Project Folder
+     file: dest=/var/www/book.example.com state=directory
+   - name: Copy Wordpress files
+     command: cp -a /tmp/wordpress/. /var/www/book.example.com creates=/var/www/book.example.com/wp-settings.php
+   - name: Create WordPress MySQL database
+     mysql_db: name=wordpress state=present
+   - name: Creates WordPress MySQL user
+     mysql_user: name=wordpress host=localhost password=ansible priv=wordpress.*:ALL
+   - name: Creates wp-config
+     template: src=wp-config.php dest=/var/www/book.example.com/wp-config.php
+   - name: Checking if Wordpress DB exists ..
+     command: mysql -u root wordpress -e 'SELECT ID FROM wordpress.wp_users LIMIT 1;'
+     register: db_exist
+     ignore_errors: true
+     changed_when: false
+   - name: Copy Wordpress DB
+     copy: src=wp-database.sql dest=/tmp/wp-database.sql
+     when: db_exist.rc > 0
+   - name: Import Wordpress DB
+     mysql_db: target=/tmp/wp-database.sql state=import name=wordpress
+     when: db_exist.rc > 0

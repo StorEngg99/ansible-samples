@@ -1,0 +1,37 @@
+---
+# tasks file for mravindra.mysql
+   - name: Add PPA repository
+     apt_repository: repo={{item}}
+     with_items:
+       - 'ppa:ondrej/mysql-5.6'
+   - name: Update the Apt Cache
+     apt: update_cache=yes cache_valid_time=3600
+   - name: MySQL install
+     apt: name={{item}} state=installed
+     with_items:
+      - mysql-server-5.6
+      - python-mysqldb
+   - name: Generate mysql root password
+     command: openssl rand -hex 7 creates=/root/.my.cnf
+     register: mysql_new_root_pass
+   - debug: msg=" new root password is {{mysql_new_root_pass.stdout}} "
+     when: mysql_new_root_pass.changed
+   - debug: msg=" No Change in password "
+     when: not mysql_new_root_pass.changed
+   - name: Remove anonymous Users
+     mysql_user: name="" state=absent
+     when: mysql_new_root_pass.changed
+   - name: Remove test database
+     mysql_db: name=test state=absent
+     when: mysql_new_root_pass.changed
+   - name: Update root password
+     mysql_user: name=root host={{item}} password={{mysql_new_root_pass.stdout}}
+     with_items:
+      - "{{ansible_hostname}}"
+      - 127.0.0.1
+      - ::1
+      - localhost
+     when: mysql_new_root_pass.changed
+   - name: Create SQL my.cnf
+     template: src=my.cnf dest=/root/.my.cnf
+     when: mysql_new_root_pass.changed

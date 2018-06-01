@@ -1,0 +1,13 @@
+---
+- hosts: all
+  vars:
+    users:
+       - name: Michael
+         department: Engineering
+       - name: John
+         department: Engineering
+       - name: Peter
+         department: Finance
+    tasks:
+       - user: name="{{item.name}}" groups=developers append=yes
+         with_items: "{{users|selectattr('department','equalto','Engineering') | list }}"

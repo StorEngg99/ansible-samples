@@ -1,0 +1,5 @@
+dependencies: 
+  - mravindra.common
+  - mravindra.php
+  - mravindra.mysql
+  - mravindra.nginx

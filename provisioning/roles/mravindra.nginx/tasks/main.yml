@@ -1,0 +1,9 @@
+---
+# tasks file for mravindra.nginx
+   - name: Nginx Install
+     apt: name=nginx state=installed
+   - name: Start nginx Service
+     service: name=nginx state=running
+   - name: Create Nginx configuration
+     template: src=default dest=/etc/nginx/sites-available/default
+     notify: restart nginx
