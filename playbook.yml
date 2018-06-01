@@ -3,5 +3,7 @@ hosts:all
 tasks:
    - name: "This is Test"
      ping:
+   - name: Install package
+     apt: name="nginx" state="installed"
 
 
